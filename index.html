@@ -67,7 +67,6 @@
       font-family: inherit;
     }
 
-    /* Botão CALCULAR (novo) */
     .btnCalc {
       display: block;
       margin: 0 auto;
@@ -150,8 +149,9 @@
 </div>
 
 <script>
+  // Tabela "sequência" (coração já está certo, aqui é a sequência)
   const regra = {0:3,1:4,2:5,3:6,4:7,5:8,6:9,7:0,8:1,9:2};
-  const KEY = 'roleta_hist_v3';
+  const KEY = 'roleta_hist_v4';
 
   function proximo(inicial, usados) {
     let a = inicial;
@@ -189,21 +189,28 @@
     // ordem por coluna (igual papel)
     const ordem = [0,3,1,4,2,5];
 
+    // calcula os 6 resultados base (sem extra ainda)
+    const base = [];
     ordem.forEach(i => {
-      const n = parseInt(inputs[i].value,10);
+      const n = parseInt(inputs[i].value, 10);
       if (isNaN(n)) return;
 
       const t = Math.abs(n) % 10;
       let c = proximo(regra[t], usados);
       usados.push(c);
-      jogada.push(c);
+      base.push(c);
     });
 
-    if (!jogada.length) return;
+    if (!base.length) return;
 
-    // 7º número extra (vai para o final)
-    let extra = proximo(regra[jogada[jogada.length-1]], usados);
+    // ✅ REGRA NOVA: extra vem LOGO DEPOIS do PRIMEIRO número
+    // Extra é calculado a partir do "próximo" do primeiro número base
+    let extra = proximo(regra[base[0]], usados);
+
+    // monta saída final: [primeiro, extra, resto...]
+    jogada.push(base[0]);
     jogada.push(extra);
+    for (let k = 1; k < base.length; k++) jogada.push(base[k]);
 
     document.getElementById('resultado').textContent = jogada.join(' - ');
     document.getElementById('resWrap').style.display = '';
